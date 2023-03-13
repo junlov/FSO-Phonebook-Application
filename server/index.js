@@ -49,9 +49,9 @@ const getPersonId = () => {
   return Math.floor(Math.random() * 100);
 };
 
-app.get("/", (req, res) => {
-  res.send("<h1>Person's Application</h1>");
-});
+// app.get("/", (req, res) => {
+//   res.send("<h1>Person's Application</h1>");
+// });
 
 app.get("/info", (req, res) => {
   const requestTime = new Date();
