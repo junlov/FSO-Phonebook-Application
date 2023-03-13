@@ -5,6 +5,7 @@ const cors = require("cors");
 const app = express();
 
 app.use(express.json());
+app.use(express.static("build"));
 app.use(morgan("tiny"));
 app.use(cors());
 
@@ -49,9 +50,9 @@ const getPersonId = () => {
   return Math.floor(Math.random() * 100);
 };
 
-// app.get("/", (req, res) => {
-//   res.send("<h1>Person's Application</h1>");
-// });
+app.get("/", (req, res) => {
+  res.send("<h1>Person's Application</h1>");
+});
 
 app.get("/info", (req, res) => {
   const requestTime = new Date();
@@ -109,6 +110,12 @@ app.post("/api/persons/", (req, res) => {
     res.json(persons.concat(personObject));
   }
 });
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, (req, res) => console.log(`Server listening on port ${PORT}`));
