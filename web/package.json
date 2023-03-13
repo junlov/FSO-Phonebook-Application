@@ -17,7 +17,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "server": "json-server --p 3001 --watch phonebook-db.json"
+    "server": "json-server --p 3001 --watch phonebook-db.json",
+    "build:ui": "npm install && rm -rf build && cd ../web && npm install && npm run build && cp -r build ../server",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "eslintConfig": {
     "extends": [

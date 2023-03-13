@@ -7,7 +7,9 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm install && npm run start"
+    "build": "npm install && npm run start",
+    "build:ui": "npm install && rm -rf build && cd ../web && npm install && npm run build && cp -r build ../server",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "author": "junlov",
   "license": "MIT",
