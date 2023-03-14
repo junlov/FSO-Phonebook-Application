@@ -1,6 +1,8 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const Person = require("./models/personModel");
 
 const app = express();
 
@@ -56,28 +58,27 @@ app.get("/", (req, res) => {
 
 app.get("/info", (req, res) => {
   const requestTime = new Date();
-  const personCount = persons.length;
+
+  // TODO : Update personCount function
+  // const personCount = Person.countDocuments({}, (err, count) => count);
+
   res.send(
-    `<p>This Phonebook API has info for ${personCount} people </p> <p>${requestTime}</p>`
+    `<p>This Phonebook API has info for  people </p> <p>${requestTime}</p>`
   );
 });
 
 // Get a list of people from the phonebook
 app.get("/api/persons", (req, res) => {
-  res.json(persons);
+  Person.find({}).then((persons) => {
+    res.json(persons);
+  });
 });
 
 // Get a single person from the phonebook
 app.get("/api/persons/:personId", (req, res) => {
-  const id = Number(req.params.personId);
-
-  if (persons.find((person) => person.id === id)) {
-    res.json(persons.find((person) => person.id === id));
-  } else {
-    console.log(`Cannot find this person with ${id}`);
-    res.statusMessage = "Cannot find this contact, please try again";
-    res.status(404).end();
-  }
+  Person.findById(req.params.personId).then((person) => {
+    res.json(person);
+  });
 });
 
 // Delete a person from the phonebook
@@ -101,13 +102,14 @@ app.post("/api/persons/", (req, res) => {
     res.statusMessage = "This person is already in the list";
     res.status(404).end();
   } else {
-    const personObject = {
+    const personObject = new Person({
       name: name,
       number: number,
-      id: getPersonId(),
-    };
+    });
 
-    res.json(persons.concat(personObject));
+    personObject.save().then((savedNumber) => {
+      res.json(savedNumber);
+    });
   }
 });
 
@@ -117,5 +119,5 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, (req, res) => console.log(`Server listening on port ${PORT}`));

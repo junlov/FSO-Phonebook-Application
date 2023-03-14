@@ -1,0 +1,21 @@
+### * Get a single person
+
+GET http://localhost:3001/api/persons/64108b5513d52248411b874f
+
+### * Get all persons
+
+GET http://localhost:3001/api/persons/
+
+### * Delete a person
+
+DELETE http://localhost:3001/api/persons/4
+
+### * Create a new person
+
+POST http://localhost:3001/api/persons/
+Content-Type: application/json
+
+{
+    "name": "Johnny Appleseed", 
+    "number": "561-944-0394"  
+}
