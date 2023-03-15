@@ -25,29 +25,6 @@ const postLog = (req, res, next) => {
 
 app.use(postLog);
 
-const persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
-
 const getPersonId = () => {
   return Math.floor(Math.random() * 100);
 };
@@ -59,47 +36,55 @@ app.get("/", (req, res) => {
 app.get("/info", (req, res) => {
   const requestTime = new Date();
 
-  // TODO : Update personCount function
-  // const personCount = Person.countDocuments({}, (err, count) => count);
-
-  res.send(
-    `<p>This Phonebook API has info for  people </p> <p>${requestTime}</p>`
-  );
+  Person.find({}).then((persons) => {
+    res.send(
+      `<p>This Phonebook API has info for ${persons.length} people </p> <p>${requestTime}</p>`
+    );
+  });
 });
 
-// Get a list of people from the phonebook
+//
+// * Get a list of people from the phonebook
+//
 app.get("/api/persons", (req, res) => {
   Person.find({}).then((persons) => {
     res.json(persons);
   });
 });
 
-// Get a single person from the phonebook
-app.get("/api/persons/:personId", (req, res) => {
-  Person.findById(req.params.personId).then((person) => {
-    res.json(person);
-  });
+//
+// * Get a single person from the phonebook
+//
+app.get("/api/persons/:personId", (req, res, next) => {
+  Person.findById(req.params.personId)
+    .then((person) => {
+      res.json(person);
+    })
+    .catch((error) => next(error));
 });
 
-// Delete a person from the phonebook
-app.delete("/api/persons/:personId", (req, res) => {
-  const id = Number(req.params.personId);
-  const person = persons.filter((person) => person.id !== id);
-
-  res.status(204).end();
+//
+// * Delete a person from the phonebook
+//
+app.delete("/api/persons/:personId", (req, res, next) => {
+  Person.findByIdAndRemove(req.params.personId)
+    .then((result) => {
+      res.status(204).end();
+    })
+    .catch((err) => next(err));
 });
 
-// Create a new person for the phonebook
+//
+// * Create a new person for the phonebook
+//
 app.post("/api/persons/", (req, res) => {
   const name = req.body.name;
   const number = req.body.number;
-  const findablePerson = persons.find((person) => person.name === name);
+  const find = Person.find({ name: name }).exec();
+  console.log("find", find);
 
   if (name === "" || number == "") {
     res.statusMessage = "Make sure to have all fields filled";
-    res.status(404).end();
-  } else if (typeof findablePerson !== "undefined") {
-    res.statusMessage = "This person is already in the list";
     res.status(404).end();
   } else {
     const personObject = new Person({
@@ -113,11 +98,47 @@ app.post("/api/persons/", (req, res) => {
   }
 });
 
+//
+// * Update a person's details in the phonebook
+//
+app.patch("/api/persons/:personId", (req, res, next) => {
+  const body = req.body;
+
+  const updatePerson = {
+    name: body.name,
+    number: body.number,
+  };
+
+  Person.findByIdAndUpdate(req.params.personId, updatePerson, { new: true })
+    .then((updatedPerson) => {
+      res.json(updatedPerson);
+    })
+    .catch((err) => next(err));
+});
+
+//
+// * Unknown Endpoint Handler Middlware
+//
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
 
 app.use(unknownEndpoint);
+
+//
+// * Error Handler Middleware
+//
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, (req, res) => console.log(`Server listening on port ${PORT}`));

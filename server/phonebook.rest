@@ -16,6 +16,16 @@ POST http://localhost:3001/api/persons/
 Content-Type: application/json
 
 {
-    "name": "Johnny Appleseed", 
+    "name": "Timmy Turnip", 
     "number": "561-944-0394"  
+}
+
+### * Update a person
+
+PATCH http://localhost:3001/api/persons/6411ee4059f8f149fe7a6c51
+Content-Type: application/json
+
+{
+    "name": "Tim Turnip",
+    "number": "867-5309"
 }
