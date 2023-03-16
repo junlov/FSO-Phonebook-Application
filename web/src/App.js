@@ -54,6 +54,11 @@ const App = () => {
         })
         .then(() => {
           setTimeout(() => setSuccessNotification(null), 5000);
+        })
+        .catch((err) => {
+          console.log(err.response.data.error);
+          setErrorNotification(err.response.data.error);
+          return setTimeout(() => setErrorNotification(null), 5000);
         });
     }
   };
@@ -98,6 +103,7 @@ const App = () => {
     if (deleteQuery === true) {
       const pushDel = (id) => phoneBookService.delete_(id);
       pushDel(id);
+      setPersons(persons.filter((person) => person.id !== id));
     } else {
       return null;
     }
