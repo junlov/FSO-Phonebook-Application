@@ -71,49 +71,46 @@ app.delete("/api/persons/:personId", (req, res, next) => {
     .then((result) => {
       res.status(204).end();
     })
-    .catch((err) => next(err));
+    .catch((error) => next(error));
 });
 
 //
 // * Create a new person for the phonebook
 //
-app.post("/api/persons/", (req, res) => {
+app.post("/api/persons/", (req, res, next) => {
   const name = req.body.name;
   const number = req.body.number;
   const find = Person.find({ name: name }).exec();
   console.log("find", find);
 
-  if (name === "" || number == "") {
-    res.statusMessage = "Make sure to have all fields filled";
-    res.status(404).end();
-  } else {
-    const personObject = new Person({
-      name: name,
-      number: number,
-    });
+  const personObject = new Person({
+    name: name,
+    number: number,
+  });
 
-    personObject.save().then((savedNumber) => {
+  personObject
+    .save()
+    .then((savedNumber) => {
       res.json(savedNumber);
-    });
-  }
+    })
+    .catch((error) => next(error));
 });
 
 //
 // * Update a person's details in the phonebook
 //
 app.patch("/api/persons/:personId", (req, res, next) => {
-  const body = req.body;
+  const { name, number } = req.body;
 
-  const updatePerson = {
-    name: body.name,
-    number: body.number,
-  };
-
-  Person.findByIdAndUpdate(req.params.personId, updatePerson, { new: true })
+  Person.findByIdAndUpdate(
+    req.params.personId,
+    { name, number },
+    { new: true, runValidators: true }
+  )
     .then((updatedPerson) => {
       res.json(updatedPerson);
     })
-    .catch((err) => next(err));
+    .catch((error) => next(error));
 });
 
 //
@@ -133,6 +130,8 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return response.status(400).send({ error: error.message });
   }
 
   next(error);

@@ -8,7 +8,7 @@ GET http://localhost:3001/api/persons/
 
 ### * Delete a person
 
-DELETE http://localhost:3001/api/persons/4
+DELETE http://localhost:3001/api/persons/64124b7f11ff0d85bddef7aa
 
 ### * Create a new person
 
@@ -16,16 +16,16 @@ POST http://localhost:3001/api/persons/
 Content-Type: application/json
 
 {
-    "name": "Timmy Turnip", 
-    "number": "561-944-0394"  
+    "name": "Barry Isley", 
+    "number": "561-944-034"  
 }
 
 ### * Update a person
 
-PATCH http://localhost:3001/api/persons/6411ee4059f8f149fe7a6c51
+PATCH http://localhost:3001/api/persons/64108853b627044f5e25b28a
 Content-Type: application/json
 
 {
-    "name": "Tim Turnip",
-    "number": "867-5309"
+    "name": "Juney Love",
+    "number": "864-000-0000"
 }
